@@ -1,52 +1,364 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/stylebot.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        body {
+            background: whitesmoke;
+            z-index: -1;
+        }
+
+        body:before {
+            content: '';
+            display: block;
+            z-index: -1;
+            background-image: url(https://miro.medium.com/max/4000/1*m9IJdAYW04MYh75ivpwUNA.png);
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            opacity: 0.3;
+        }
+
+        {box-sizing: border-box;}
+
+        body {font-family: Calibri (Body);}
+* {box-sizing: border-box;}
+
+.btn {
+  background-color: DodgerBlue;
+  border: none;
+  padding: 12px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  position: fixed;
+  bottom: 70px;
+  right: 28px;
+  width: 280px;
+}
+
+.btnclose {
+    border: none;
+    /* padding: 12px 16px; */
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+    /* padding: 16px 20px; */
+    border: none;
+    cursor: pointer;
+    opacity: 10.8;
+    position: fixed;
+    bottom: 70px;
+    right: 28px;
+    width: 280px;
+    height: 60px;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: RoyalBlue;
+}
+
+.chat-popup {
+ display: none;
+ position: fixed;
+ bottom: 128px;
+ right: 15px;
+ z-index: 11;
+ width: 24%;
+ }
+
+
+
+        header {
+            background-color: #fff;
+            position: fixed;
+            left: 0;
+            top: 0;
+            right: 0;
+            box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        section {
+            margin-top: 75px;
+            padding: 30px 20px;
+        }
+
+        #chatbox {
+            background: #fff;
+            clear: both;
+            min-height: 62px;
+        }
+
+        footer {
+            background-color: #fff;
+            padding: 15px 15px;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            text-align: right;
+        }
+
+        .userText {
+            clear: both;
+        }
+
+        .userText span {
+            float: right;
+            padding: 5px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        .botText span {
+            float: left;
+            padding: 5px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        .clearBoth {
+            clear: both;
+        }
+
+
+    </style>
 </head>
+
 <body>
-    <h1 class="jumbotron text-center">Chatterbot in Python using Flask Framework</h1>
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <div class="col-sm-6 offset-sm-3">
-            <div id="chatbox" class="border border-success">
-                <p class="botText"><span>Hi! I'm Chatterbot</span></p>
-            </div>
-            <div id="userInput">
-                <input id="textInput" class="form-control" type="text" name="msg" placeholder="Type Your Message Here">
-                <input id="buttonInput" class="btn btn-success form-control" type="submit" value="Send">
-            </div>
+        <div class="col-sm-12">
+            <header>
+                <img routerLink="/"
+                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAABLCAYAAABTA2OWAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQ1IDc5LjE2MzQ5OSwgMjAxOC8wOC8xMy0xNjo0MDoyMiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTkgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjVFRjc4QjQyQkZGRjExRTlCNTk0QTFENzY1RkY1MDREIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjVFRjc4QjQzQkZGRjExRTlCNTk0QTFENzY1RkY1MDREIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NUVGNzhCNDBCRkZGMTFFOUI1OTRBMUQ3NjVGRjUwNEQiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NUVGNzhCNDFCRkZGMTFFOUI1OTRBMUQ3NjVGRjUwNEQiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6jl4ALAAASGElEQVR42uxd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"
+                />
+            </header>
         </div>
     </div>
-<script>
-    function getResponse() {
-        let userText = $("#textInput").val();
-        let userHtml = '<p class="userText"><span>' + userText + '</span></p>';
-        $("#textInput").val("");
-        $("#chatbox").append(userHtml);
-        document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
-        $.get("/get", { msg: userText }).done(function(data) {
-        var botHtml = '<p class="botText"><span>' + data + '</span></p>';
-        $("#chatbox").append(botHtml);
-        document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
-});
-}
-    $("#textInput").keypress(function(e) {
-    //if enter key is pressed
-        if(e.which == 13) {
-            getResponse();
-        }
-    });
-    $("#buttonInput").click(function() {
-        getResponse();
-    });
-    </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </div>
+<section>
+    <!-- <h1 class="jumbotron text-center">Hello ESG ! </h1> -->
+    <!-- <div class="container">
+        <div class="row">
+            <div class="col-sm-6 offset-sm-3">
+                <div id="chatbox" class="border border-success">
+                    <p class="botText">
+                        <span>Hi! I'm ESG Chat bot</span>
+                    </p>
+                </div>
+                <div id="userInput">
+                    <input id="textInput" class="form-control" type="text" name="msg" placeholder="Type Your Message Here">
+                    <input id="buttonInput" class="btn btn-success form-control" type="submit" value="Send">
+                </div>
+                <div class="clearBoth"></div>
+            </div>
+        </div>
+    </div> -->
+    <div class="row">
+        <div class="col-sm-4 offset-sm-2">
+            <h1> About ESG</h1>
+            <p>ESG generally means a broad set of environmental, social
+                and corporate governance considerations that may impact a
+                company’s ability to execute its business strategy and create
+                value over the long term. While ESG factors are at times called
+                non-financial, how a company manages them undoubtedly has
+                measurably financial consequences.
+                Over the course of this project, we managed to create a short
+                list of the most pervasive and persuasive ESG metrics—the
+                Key Performance Indicators (KPIs) that we believe provide
+                the greatest insight into the sustainability performance of the
+                greatest number of companies. Our evaluation of these metrics
+                was based on five key factors: precedent, prevalence, potential,
+                perspective, and practicality.
+                Through our trade association the World Federation of
+                Exchanges, or WFE, exchanges have worked together for
+                many years to create a short list of the most pervasive
+                and persuasive ESG metrics. These are the KPIs that we
+                believe provide the greatest insight into the sustainability
+                performance of the greatest number of companies.</p>
+        </div>
+        <div class="col-sm-3 offset-sm-3">
+
+        </div>
+    </div>
+    <button class="btn" onclick="openForm()"><i class="fa fa-comments" style="font-size:36px"></i></button>
+    <!-- <img src="https://botcopy-bot-assets.s3.amazonaws.com/bots/5d78e4fe848d3754b5f06f67/lg.jpg" class="botcopy--avatar-image" onclick="openForm()"> -->
+
+    <div class="chat-popup" id="myForm" style="display:none;">
+        <!--  <h1>Chat</h1>
+
+          <label for="msg">
+              <b>Message</b>
+          </label>
+          <textarea id="textInput" class="form-control" placeholder="Type message.." name="msg" required></textarea>
+
+          <button type="submit" class="btn">Send</button>
+              <input id="textInput" class="form-control" type="text" name="msg" placeholder="Type Your Message Here"> -->
+        <!-- <input id="buttonInput" class="btn btn-success form-control" type="submit" value="Send">
+         <div class="clearBoth"></div>
+         <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
+        <div class="container">
+            <div id="chatbox" style="height:550px;" class="border border-success overflow-auto smooth-scroll">
+                <p class="botText"><span>Hi! I'm ESG Chat bot</span></p>
+            </div>
+            <div id="userInput">
+                <div class="row">
+                    <div class="col-sm-11">
+                        <input id="textInput" class="form-control" type="text" name="msg"
+                               placeholder="Type Your Message Here"></div>
+                    <i id="buttonInput" class="fa fa-paper-plane" style="font-size:24px;padding-top:5px;"></i></div>
+                <!-- <input id="buttonInput" class="btn-success form-control" type="submit" value="Send"> -->
+                <button type="button" class="btnclose btn-danger form-control" onclick="closeForm()"><i
+                        class="fa fa-times" style="font-size:36px;padding-top:5px;" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="clearBoth"></div>
+        </div>
+    </div>
+</section>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <footer>
+                ©2019 MSCI INC. ALL RIGHTS RESERVED
+            </footer>
+        </div>
+    </div>
+</div>
+
+<script>
+        function openForm() {
+            document.getElementById("myForm").style.display = "block";
+        }
+
+        function closeForm() {
+            document.getElementById("myForm").style.display = "none";
+        }
+        function getResponse() {
+            let userText = $("#textInput").val();
+            let userHtml = '<p class="userText"><span>' + userText + '</span></p>';
+            $("#textInput").val("");
+            $("#chatbox").append(userHtml);
+            document.getElementById('userInput').scrollIntoView({ block: 'start', behavior: 'smooth' });
+            $.get("/get", { msg: userText }).done(function (data) {
+                var botHtml = '<p class="botText"><span>' + data + '</span></p>';
+                $("#chatbox").append(botHtml);
+                document.getElementById('userInput').scrollIntoView({ block: 'start', behavior: 'smooth' });
+            });
+        }
+        $("#textInput").keypress(function (e) {
+            //if enter key is pressed
+            if (e.which == 13) {
+                getResponse();
+            }
+        });
+        $("#buttonInput").click(function () {
+            getResponse();
+        });
+
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
 </body>
+<style>
+    {
+        box-sizing: border-box;
+    }
+
+    /* Button used to open the chat form - fixed at the bottom of the page */
+
+    .open-button {
+        background-color: #555;
+        color: white;
+        padding: 16px 20px;
+        border: none;
+        cursor: pointer;
+        opacity: 0.8;
+        position: fixed;
+        bottom: 72px;
+        right: 28px;
+        width: 280px;
+    }
+
+    /* The popup chat - hidden by default */
+
+    .form-popup {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        right: 15px;
+        border: 3px solid #f1f1f1;
+        z-index: 9;
+    }
+
+    /* Add styles to the form container */
+
+    .form-container {
+        max-width: 300px;
+        padding: 10px;
+        background-color: white;
+    }
+
+    /* Full-width textarea */
+
+    .form-container textarea {
+        width: 100%;
+        padding: 15px;
+        margin: 5px 0 22px 0;
+        border: none;
+        background: #f1f1f1;
+        resize: none;
+        min-height: 200px;
+    }
+
+    /* When the textarea gets focus, do something */
+
+    .form-container textarea:focus {
+        background-color: #ddd;
+        outline: none;
+    }
+
+    /* Set a style for the submit/login button */
+
+    .form-container .btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 16px 20px;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        margin-bottom: 10px;
+        opacity: 0.8;
+    }
+
+    /* Add a red background color to the cancel button */
+
+    .form-container .cancel {
+        background-color: red;
+    }
+
+    /* Add some hover effects to buttons */
+
+    .form-container .btn:hover,
+    .open-button:hover {
+        opacity: 1;
+    }
+
+</style>
+
 </html>
