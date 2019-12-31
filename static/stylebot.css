@@ -1,0 +1,30 @@
+#textInput {
+    border: 1px solid black;
+}
+.userText {
+    color: white;
+    font-family: Calibri (Body);
+    font-size: 14px;
+    text-align: right;
+    line-height: 20px;
+}
+.userText span {
+    background-color: #ff5959 ;
+    padding: 10px;
+    border-radius: 2px;
+}
+.botText {
+    color: white;
+    font-family: Calibri (Body);
+    font-size: 14px;
+    text-align: left;
+    line-height: 20px;
+}
+.botText span {
+    background-color: #7077af;
+    padding: 10px;
+    border-radius: 2px;
+}
+.glyphicon {
+    font-size: 50px;
+}
